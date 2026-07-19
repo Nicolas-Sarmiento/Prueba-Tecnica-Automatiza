@@ -30,6 +30,7 @@ Para los criterios de inclusión se utilizaron los siguientes. Una funcionalidad
 - Reduce considerablemente el tiempo de actividades que se realizan de forma manual.
 - Hace parte del flujo principal del negocio y permite que se amplie a futuras versiones sin requerir rediseños importantes.
 - Es alcanzable dentro de los límites de tiempos establecidos.  
+  
 Por otro lado, los criterios de exclusión de una funcionalidad son los siguientes: 
 - No es prioridad.
 - Depende de información que no está disponible.
