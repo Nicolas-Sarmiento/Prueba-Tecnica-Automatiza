@@ -45,13 +45,9 @@ Si bien, existen otros lenguajes utilizados en la industria, como Java, la cual 
 
 ## Diagrama de Componentes
 
-A continuación se presenta el diagrama de componentes del sistema. En el cual se presenta a un alto nivel la representación de las unidades modulares del sistema. Se puede apreciar el desacomplamiento de las tecnologías externas como la base de datos y la API de BioStar. Adicionalmente, se tienen componentes que proveen esas interfaces y que se pueden reemplazar, por otro componente que provean la misma interfaz.
+A continuación se presenta el diagrama de componentes del sistema. En el cual se presenta a un alto nivel la representación de los módulos del sistema. Se puede apreciar el desacomplamiento de las tecnologías externas como la base de datos y la API de BioStar. Adicionalmente, se tienen componentes que proveen esas interfaces y que se pueden reemplazar, por otro componente que provean la misma interfaz.
 
-Existen los componentes de servicio personas, el cual está encargado de ocupar las reglas del negocio y de contener la lógica del negocio en lo que refiere a las funcionalidades para la gestión de los usuarios.
-
-El componente de servicio de informes está encargado de las funcionalidades de los servicios, tiene una dependencia hacia los componentes que consumen BioStar porque son los que proveen la información de los sistemas físicos de acceso.
-
-El componente de autenticación es el encargado de manejar la autenticación de los usuarios del sistema, requiere de una interfaz para realizar las consultas de los datos de usuarios y generar los tokens de autenticación.
+En el diagrama de componentes se representan los módulos para la gestión de las principales entidades del dominio del negocio, como lo son personas, ubicaciones y eventos. Cada módulo internamente está compuesto por las diferentes capas del modelo hexagonal, como lo son el dominio y casos de uso. Se realiza una representación de mayor nivel para representarlas como un componente conjunto, el cual está separado del componente que accede a los datos, demostrando un desacople de la lógica del negocio de la persistencia de la información.
 
 En el frontend hay dos componentes principales, la vista de las personas donde se realizan los procesos relacionados a la carga de personas. También está la vista de los informes donde se presenta al usuario la información de los informes y los controles para generarlos.
 
@@ -63,11 +59,13 @@ El diagrama de Entidad-Relación se puede apreciar a continuación. Se realizó 
 
 Para las sedes, se decidió modelar ubicaciones, ya que de esta forma en el futuro se puede agregar los pisos, oficinas, salas de servidores, etc. Se incluye los datos de la dirección y un campo extra que permitirá construir la jerarquía de zonas, ya que una sede puede tener varios pisos, oficinas, entre otras, esto es representado por la relación autorreferencial.
 
+Para hacer la integración con la API de BioStar, se decide agregar la entidad punto de acceso, la cual está relacionada a las ubicaciones y la que es registrada en los eventos de acceso de una persona.
+
+Se decide agregar una hoja de puntos de acceso al formato de Excel, así como campos en la hoja de Sedes para completar el modelo, esto con el fin de diseñar el sistema para que luego pueda aceptar ubicaciones como oficinas, pisos, salas, entre otras.
+
 Por otra parte, se decide modelar personas y no empleados directamente porque esto permite que el sistema escale a los diferentes tipos de personas que puedan ingresar, aunque para el MVP solo se trabajará con empleados. Las personas solamente registrarán en el sistema sus nombres y los documentos de identificación que tengan, es posible que se relacione con más de uno.
 
-En la tabla de empleados solamente se guarda el id presente en el Excel, asumiendo que representa una identificación en un sistema interno del banco. El sistema como solamente requiere mostrar la información de qué personas entraron y cuántas hay en el sistema, solamente se almacena dicha información. En caso que por empleado se requiera almacenar más información, entonces se agrega a la tabla de empleado.
-
-Finalmente, la tabla que guarda los eventos, es decir, las entradas y salidas, almacena la ubicación donde ocurre y la persona, así mismo, la hora y fecha y el tipo de evento, si es salida o entrada.
+Finalmente, la tabla que guarda los eventos, es decir, las entradas y salidas, almacena el punto de acceso donde ocurre y la persona, así mismo, la hora y fecha y el tipo de evento, si es salida o entrada.
 
 
-![diagrama_entidad_relacion](./imgs/Diagrama_Entidad-Relacion.png)
+![diagrama_entidad_relacion](./imgs/diagrama_entidad-relacion.png)
