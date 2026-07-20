@@ -108,11 +108,11 @@ La entrevista permitió identificar algunos puntos que requieren aclaración deb
 
 4. Aunque en la entrevista se habla de que existen personas con diferentes documentos de identificación, ¿existe uno principal o todos tienen la misma validez?
 
-    Como hay varios empleados con diferentes documentos, según la información proporcionada en la entrevista. Debido a que una persona puede tener múltiples documentos registrados, el documento no será utilizado como identificador único del registro.
+    Como hay varios empleados con diferentes documentos, según la información proporcionada en la entrevista. Debido a que una persona puede tener múltiples documentos registrados, el documento no será utilizado como identificador único del registro. Se tomará como documento principal el primer documento ingresado, con fines de resolver el problema de los registros duplicados en el informe de las entradas y salidas.
 
 5. Cuando se detecte una anomalía en el acceso de una persona, como una entrada sin una salida previa, ¿cómo espera el negocio que se gestione la situación para el cálculo del aforo?
 
-    Se asume que el cálculo no tiene que ser 100% preciso y se busca una estimación. El cálculo del aforo se realizará mediante la diferencia entre eventos de entrada y salida registrados. Los eventos faltantes no serán inferidos, por lo que el resultado representa una estimación basada únicamente en la información disponible.
+    El cálculo del aforo se realizará mediante la diferencia entre eventos de entrada y salida registrados. Los eventos faltantes no serán inferidos, por lo que el resultado representa una estimación basada únicamente en la información disponible.
 
 6. ¿El aforo representa únicamente la ocupación actual o también se debería permitir consultas históricas sobre este dato?
 
@@ -137,3 +137,6 @@ La entrevista permitió identificar algunos puntos que requieren aclaración deb
 11. ¿Las personas que no son empleados también manejan un id_biostar o su gestión es diferente a la de los empleados?
 
     Se asume que cualquier persona registrada en el sistema de control de acceso cuenta con un identificador proporcionado por BioStar. Esto permite mantener la integración con dicho sistema sin importar el tipo de persona registrado.
+
+12. ¿Cómo realizan el proceso de gestión de los dispositivos, sedes o puertas dentro del sistema de BioStar?  
+    Se asume que los datos de las puertas están precargados en BioStar y que se pueden importar al sistema a través de un archivo de Excel, así como las sedes. Este suposición se realiza para realizar la conexión entre las ubicaciones y los puntos de acceso y que sea posible la identificación de las entradas y salidas.
