@@ -1,0 +1,45 @@
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: automatiza_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: automatiza
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+    container_name: automatiza_backend
+    ports:
+      - "3000:3000"
+    command: sh -c "npm run migrate && npm run seed && npm start"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: password
+      DB_NAME: automatiza
+      DATABASE_URL: postgres://admin:password@db:5432/automatiza
+      BIOSTAR_API_URL: http://biostar-mock:4000
+    depends_on:
+      - db
+      - biostar-mock
+    restart: always
+
+  biostar-mock:
+    build:
+      context: ./biostar-mock
+    container_name: automatiza_biostar_mock
+    ports:
+      - "4000:4000"
+    restart: always
+
+volumes:
+  pgdata:
