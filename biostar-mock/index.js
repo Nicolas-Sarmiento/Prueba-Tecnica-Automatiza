@@ -7,7 +7,7 @@ app.use(cors());
 
 // In-memory store for events
 let events = [];
-let eventIdCounter = 1;
+let eventIdCounter = Date.now();
 
 // Endpoint to generate an event (used externally to simulate access)
 app.post('/api/events', (req, res) => {
