@@ -1,0 +1,422 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Control de Accesos Banco Andino",
+    "version": "1.0.0",
+    "description": "Documentación de la API del Backend para el sistema de Control de Accesos."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "description": "Servidor Local (Docker)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Iniciar sesión",
+        "description": "Autentica a un usuario y devuelve un token JWT.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "12345678"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "admin123"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR..."
+                    },
+                    "role": {
+                      "type": "string",
+                      "example": "ADMIN"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas"
+          }
+        }
+      }
+    },
+    "/import": {
+      "post": {
+        "summary": "Importar datos desde Excel",
+        "description": "Permite importar personas, ubicaciones y puntos de acceso mediante un archivo Excel. Requiere rol ADMIN.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo Excel (.xlsx o .xls) con los datos a importar."
+                  },
+                  "hojas": {
+                    "type": "string",
+                    "description": "Nombres de las hojas a importar separadas por coma (ej. Empleados,Ubicaciones,Accesos)",
+                    "example": "Empleados,Ubicaciones,Accesos"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Importación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "summary": {
+                          "type": "object",
+                          "example": {
+                            "Empleados": {
+                              "created": 10,
+                              "updated": 2,
+                              "rejected": 0
+                            },
+                            "Ubicaciones": {
+                              "created": 5,
+                              "updated": 0,
+                              "rejected": 1
+                            }
+                          }
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          },
+                          "example": [
+                            {
+                              "sheet": "Ubicaciones",
+                              "row": 2,
+                              "reason": "codigo_ubicacion es obligatorio"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "403": {
+            "description": "Prohibido (requiere ADMIN)"
+          }
+        }
+      }
+    },
+    "/persons": {
+      "get": {
+        "summary": "Obtener personas",
+        "description": "Retorna la lista de todas las personas registradas. Requiere rol SUPERVISOR o ADMIN.",
+        "responses": {
+          "200": {
+            "description": "Lista de personas obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": [
+                        {
+                          "personId": 1,
+                          "biostar_id": "EMP001",
+                          "firstName": "JUAN",
+                          "secondName": "CARLOS",
+                          "firstLastName": "PEREZ",
+                          "secondLastName": "GOMEZ",
+                          "document": {
+                            "documentType": "CC",
+                            "documentNumber": "123456789",
+                            "country": "COLOMBIA"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locations": {
+      "get": {
+        "summary": "Obtener ubicaciones",
+        "description": "Retorna la lista de ubicaciones. Requiere rol SUPERVISOR o ADMIN.",
+        "responses": {
+          "200": {
+            "description": "Lista de ubicaciones obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": [
+                        {
+                          "locationId": 1,
+                          "locationCode": "LOC01",
+                          "name": "SEDE PRINCIPAL",
+                          "type": "SEDE",
+                          "isActive": true,
+                          "capacity": 100,
+                          "address": "Calle 123 #45-67",
+                          "city": "BOGOTA",
+                          "country": "COLOMBIA"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access-points": {
+      "get": {
+        "summary": "Obtener puntos de acceso",
+        "description": "Retorna la lista de puntos de acceso. Requiere rol SUPERVISOR o ADMIN.",
+        "responses": {
+          "200": {
+            "description": "Lista de puntos de acceso obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": [
+                        {
+                          "accessPointId": 1,
+                          "biostar_id": "AP01",
+                          "name": "TORNIQUETE 1 ENTRADA SUR",
+                          "locationId": 1,
+                          "locationName": "SEDE PRINCIPAL"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/occupancy": {
+      "get": {
+        "summary": "Reporte de Ocupación",
+        "description": "Muestra la cantidad de personas actuales por ubicación.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "location_id",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID de la ubicación para filtrar (opcional)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte de ocupación obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": [
+                        {
+                          "locationId": 1,
+                          "name": "SEDE PRINCIPAL",
+                          "capacity": 100,
+                          "occupancyLevel": 25
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/events": {
+      "get": {
+        "summary": "Reporte de Eventos de Acceso",
+        "description": "Muestra un historial de eventos (entradas/salidas).",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "location_id",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID de la ubicación para filtrar (opcional)"
+          },
+          {
+            "in": "query",
+            "name": "start_date",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-01-01T00:00:00.000Z"
+            },
+            "description": "Fecha de inicio"
+          },
+          {
+            "in": "query",
+            "name": "end_date",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-12-31T23:59:59.999Z"
+            },
+            "description": "Fecha de fin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte de Eventos de Acceso obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": [
+                        {
+                          "eventId": 1234,
+                          "biostarId": "EMP001",
+                          "personName": "JUAN PEREZ",
+                          "locationName": "SEDE PRINCIPAL",
+                          "accessPointName": "ENTRADA SUR",
+                          "eventType": "ENTRADA",
+                          "timestamp": "2024-03-15T08:00:00.000Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
