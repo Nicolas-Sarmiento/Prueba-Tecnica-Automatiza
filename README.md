@@ -22,8 +22,8 @@ Este proyecto está completamente contenedorizado (Dockerizado) para garantizar 
 
 1. **Clona o descarga este repositorio** y abre una terminal en la carpeta raíz del proyecto (donde se encuentra el archivo `docker-compose.yml`).
 ```bash
-git clone https://github.com/TuUsuario/tu-repo.git
-cd tu-repo
+git clone https://github.com/Nicolas-Sarmiento/Prueba-Tecnica-Automatiza.git
+cd Prueba-Tecnica-Automatiza
 ```
 2. **Ejecuta el siguiente comando** para construir las imágenes y levantar todos los servicios en segundo plano:
    ```bash
