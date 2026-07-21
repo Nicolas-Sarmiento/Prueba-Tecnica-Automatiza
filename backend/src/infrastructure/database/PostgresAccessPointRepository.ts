@@ -46,4 +46,11 @@ export class PostgresAccessPointRepository implements IAccessPointRepository {
     if (res.rowCount === 0) return null;
     return res.rows[0].accessPointId;
   }
+
+  async getLocationIdByAccessPointId(accessPointId: number): Promise<number | null> {
+    const query = `SELECT "locationId" FROM "AccessPoint" WHERE "accessPointId" = $1`;
+    const res = await this.db.query(query, [accessPointId]);
+    if (res.rowCount === 0) return null;
+    return res.rows[0].locationId;
+  }
 }

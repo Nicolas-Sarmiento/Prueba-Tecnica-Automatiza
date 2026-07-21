@@ -44,6 +44,11 @@ export class PostgresLocationRepository implements ILocationRepository {
     if (res.rowCount === 0) return null;
     return res.rows[0].locationId;
   }
+  async getLocationById(locationId: number): Promise<boolean> {
+    const query = `SELECT "locationId" FROM "Location" WHERE "locationId" = $1`;
+    const res = await this.client.query(query, [locationId]);
+    return res.rowCount !== null && res.rowCount > 0;
+  }
 
   async getAllLocations(): Promise<Location[]> {
     const query = `SELECT * FROM "Location"`;

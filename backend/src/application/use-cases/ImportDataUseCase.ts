@@ -16,9 +16,23 @@ export interface ImportError {
 
 export type ImportSummary = Record<string, { created: number; updated: number; rejected: number }>;
 
+/**
+ * Caso de uso encargado de la importación masiva de datos desde archivos Excel.
+ *
+ * Utiliza transacciones de base de datos (SAVEPOINTs) para asegurar que 
+ * la importación sea parcialmente resiliente: si falla una fila, la transacción 
+ * completa no se aborta, permitiendo insertar los registros correctos.
+ */
 export class ImportDataUseCase {
   constructor(private excelParser: ExcelParserService) {}
 
+  /**
+   * Ejecuta la lectura e inserción de datos de las hojas de Excel.
+   * 
+   * @param fileBuffer - El buffer de memoria que contiene el archivo Excel.
+   * @param sheetsToImport - Arreglo con los nombres de las hojas que se desean importar.
+   * @returns Resumen de creación/actualización/rechazo y lista detallada de errores por fila.
+   */
   async execute(fileBuffer: Buffer, sheetsToImport: string[]) {
     const data = this.excelParser.parse(fileBuffer);
     const summary: ImportSummary = {};
@@ -137,7 +151,7 @@ export class ImportDataUseCase {
           biostar_id: biostar_id.toString().trim()
         });
 
-        if (row['tipo_doc'] && row['numero_documento']) {
+        if (row['tipo_doc'] && row['numero_documento'] && country) {
           await repo.upsertDocument(personId, {
             documentType: normalizeText(row['tipo_doc']),
             documentNumber: row['numero_documento'].toString().trim(),

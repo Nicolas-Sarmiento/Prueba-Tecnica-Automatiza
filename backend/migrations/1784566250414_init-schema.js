@@ -45,7 +45,7 @@ exports.up = (pgm) => {
     },
     documentType: { type: 'document_type_enum', notNull: true },
     documentNumber: { type: 'varchar(50)', notNull: true },
-    country: { type: 'country_enum' },
+    country: { type: 'country_enum', notNull: true },
     main: { type: 'boolean', default: false },
   });
   
@@ -80,7 +80,7 @@ exports.up = (pgm) => {
       references: '"Person"',
       onDelete: 'CASCADE',
     },
-    timestamp: { type: 'timestamp', notNull: true },
+    timestamp: { type: 'timestamptz', notNull: true },
     eventType: { type: 'event_type_enum', notNull: true },
     biostar_eventId: { type: 'varchar(100)', unique: true },
   });
