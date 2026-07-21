@@ -49,7 +49,7 @@ A continuación se presenta el diagrama de componentes del sistema. En el cual s
 
 En el diagrama de componentes se representan los módulos para la gestión de las principales entidades del dominio del negocio, como lo son personas, ubicaciones y eventos. Cada módulo internamente está compuesto por las diferentes capas del modelo hexagonal, como lo son el dominio y casos de uso. Se realiza una representación de mayor nivel para representarlas como un componente conjunto, el cual está separado del componente que accede a los datos, demostrando un desacople de la lógica del negocio de la persistencia de la información.
 
-En el frontend hay dos componentes principales, la vista de las personas donde se realizan los procesos relacionados a la carga de personas. También está la vista de los informes donde se presenta al usuario la información de los informes y los controles para generarlos.
+En el frontend hay dos componentes principales, la vista de los datos donde se realizan los procesos relacionados a la carga de personas, sedes y puntos de acceso. También está la vista de los informes donde se presenta al usuario la información de los reportes de ocupación, eventos de acceso.
 
 ![diagrama_componentes](./imgs/diagrama_componentes.png)
 
