@@ -1,0 +1,27 @@
+name: CI / Docker Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check npm CI
+        run: cd backend && npm ci
+      
+      - name: Run npm test
+        run: cd backend && npm test 
+      
+      - name: Build Docker Compose Services
+        run: docker compose build
+
