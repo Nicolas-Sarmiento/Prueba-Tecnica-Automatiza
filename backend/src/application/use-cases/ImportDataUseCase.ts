@@ -105,9 +105,12 @@ export class ImportDataUseCase {
       const code = normalizeId(row['codigo_ubicacion']);
       const name = normalizeText(row['nombre_ubicacion']);
       const country = normalizeText(row['pais']);
+      const address = row['direccion'];
+      const city = normalizeText(row['ciudad']);
+      const capacity = row['aforo_maximo']
 
-      if (!code || !name || !country) {
-        errors.push({ sheet: 'Ubicaciones', row: rowNumber, reason: 'codigo_ubicacion, nombre_ubicacion y pais son obligatorios' });
+      if (!code || !name || !country || !address || !city || !capacity) {
+        errors.push({ sheet: 'Ubicaciones', row: rowNumber, reason: 'codigo_ubicacion, nombre_ubicacion, pais, direccion, ciudad y aforo_maximo son obligatorios' });
         rejected++;
         continue;
       }
@@ -117,11 +120,11 @@ export class ImportDataUseCase {
         const { isNew } = await repo.upsertLocation({
           locationCode: code,
           name: name,
-          city: normalizeText(row['ciudad']),
+          city: city,
           country: country,
-          address: row['direccion'],
-          capacity: row['aforo_maximo'] || 0,
-          isActive: row['activa'] !== 'NO',
+          address: address,
+          capacity: capacity,
+          isActive: normalizeText(row['activa']) !== 'NO',
           type: row['tipo'] ? normalizeText(row['tipo']) : 'SEDE'
         });
 
