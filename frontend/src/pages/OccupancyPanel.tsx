@@ -33,7 +33,7 @@ export default function OccupancyPanel() {
   return (
     <div className="fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 style={{ fontWeight: 600 }}>Nivel de Ocupación (Tiempo Real)</h2>
+        <h2 style={{ fontWeight: 600 }}>Nivel de Ocupación</h2>
         <button className="btn btn-primary" onClick={handleExport} disabled={occupancyData.length === 0}>
           <Download size={16} /> Exportar Excel
         </button>
@@ -63,6 +63,7 @@ export default function OccupancyPanel() {
                 <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   Código: <strong>{loc.locationCode}</strong>
                 </div>
+                
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.5rem' }}>
                   <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Ocupación</span>
