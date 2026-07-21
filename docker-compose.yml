@@ -28,6 +28,7 @@ services:
       DB_NAME: automatiza
       DATABASE_URL: postgres://admin:password@db:5432/automatiza
       BIOSTAR_API_URL: http://biostar-mock:4000
+      JWT_SECRET: my-super-secret-key-12345
     depends_on:
       - db
       - biostar-mock
