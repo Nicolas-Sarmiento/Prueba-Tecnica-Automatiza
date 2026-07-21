@@ -36,7 +36,20 @@ export default function QueryPanel() {
       const response = await api.get('/reports/events', {
         params: { startDate: startIso, endDate: endIso, locationId }
       });
-      setEvents(response.data);
+      const data = response.data.map( (row: any) => ({
+        "evento_id": row.eventId,
+        "timestamp": row.timestamp,
+        "biostar_event_id": row.biostar_eventId,
+        "biostar_id_persona": row.person_biostar_id,
+        "tipo_evento": row.eventType,
+        "primer_nombre": row.firstName,
+        "primer_apellido": row.firstLastName,
+        "tipo_doc": row.documentType,
+        "documento": row.documentNumber,
+        "ubicacion": row.locationName,
+        "punto_acceso": row.accessPointName
+      }));
+      setEvents(data);
     } catch (error) {
       console.error('Error fetching events:', error);
       alert('Error al consultar eventos.');
