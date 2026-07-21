@@ -19,7 +19,6 @@ services:
     container_name: automatiza_backend
     ports:
       - "3000:3000"
-    command: sh -c "npm run migrate && npm run seed && npm start"
     environment:
       DB_HOST: db
       DB_PORT: 5432
