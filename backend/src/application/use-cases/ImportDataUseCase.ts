@@ -135,8 +135,8 @@ export class ImportDataUseCase {
       const firstLastName = normalizeText(row['primer_apellido']);
       const country = normalizeText(row['pais']);
 
-      if (!biostar_id || !firstName || !firstLastName || !country) {
-        errors.push({ sheet: 'Empleados', row: rowNumber, reason: 'id_biostar, primer_nombre, primer_apellido y pais son obligatorios' });
+      if (!biostar_id || !firstName || !firstLastName || !country || !row['tipo_doc'] || !row['numero_documento']) {
+        errors.push({ sheet: 'Empleados', row: rowNumber, reason: 'id_biostar, primer_nombre, primer_apellido, pais, tipo_doc y numero_documento son obligatorios' });
         rejected++;
         continue;
       }
