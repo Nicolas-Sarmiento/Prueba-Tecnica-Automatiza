@@ -3,7 +3,7 @@ import { ExcelParserService, ExcelRow } from '../../infrastructure/services/Exce
 import { PostgresLocationRepository } from '../../infrastructure/database/PostgresLocationRepository';
 import { PostgresPersonRepository } from '../../infrastructure/database/PostgresPersonRepository';
 import { PostgresAccessPointRepository } from '../../infrastructure/database/PostgresAccessPointRepository';
-import { normalizeText } from '../utils/Normalizer';
+import { normalizeText, normalizeId } from '../utils/Normalizer';
 import { ILocationRepository } from '../../domain/repositories/ILocationRepository';
 import { IPersonRepository } from '../../domain/repositories/IPersonRepository';
 import { IAccessPointRepository } from '../../domain/repositories/IAccessPointRepository';
@@ -39,6 +39,18 @@ export class ImportDataUseCase {
     const errors: ImportError[] = [];
 
     const client = await Database.getClient();
+
+    if (sheetsToImport.includes('Ubicaciones') && !data['Ubicaciones']) {
+      errors.push({ sheet: 'Ubicaciones', row: 1, reason: 'No se encontraron datos para la hoja Ubicaciones' });
+    }
+
+    if (sheetsToImport.includes('Empleados') && !data['Empleados']) {
+      errors.push({ sheet: 'Empleados', row: 1, reason: 'No se encontraron datos para la hoja Empleados' });
+    }
+
+    if (sheetsToImport.includes('Accesos') && !data['Accesos']) {
+      errors.push({ sheet: 'Accesos', row: 1, reason: 'No se encontraron datos para la hoja Accesos' });
+    }
     
     try {
       await client.query('BEGIN');
@@ -90,7 +102,7 @@ export class ImportDataUseCase {
     
     for (const [index, row] of rows.entries()) {
       const rowNumber = index + 2;
-      const code = row['codigo_ubicacion'];
+      const code = normalizeId(row['codigo_ubicacion']);
       const name = normalizeText(row['nombre_ubicacion']);
       const country = normalizeText(row['pais']);
 
@@ -103,14 +115,14 @@ export class ImportDataUseCase {
       try {
         await client.query(`SAVEPOINT row_${rowNumber}`);
         const { isNew } = await repo.upsertLocation({
-          locationCode: code.toString().trim(),
+          locationCode: code,
           name: name,
           city: normalizeText(row['ciudad']),
           country: country,
           address: row['direccion'],
           capacity: row['aforo_maximo'] || 0,
           isActive: row['activa'] !== 'NO',
-          type: row['Tipo'] ? normalizeText(row['Tipo']) : 'SEDE'
+          type: row['tipo'] ? normalizeText(row['tipo']) : 'SEDE'
         });
 
         isNew ? created++ : updated++;
@@ -130,12 +142,13 @@ export class ImportDataUseCase {
     
     for (const [index, row] of rows.entries()) {
       const rowNumber = index + 2;
-      const biostar_id = row['id_biostar'] || row['biostar_id'];
+      const biostar_id = normalizeId(row['id_biostar'] || row['biostar_id']);
       const firstName = normalizeText(row['primer_nombre']);
       const firstLastName = normalizeText(row['primer_apellido']);
       const country = normalizeText(row['pais']);
+      const docNum = normalizeId(row['numero_documento']);
 
-      if (!biostar_id || !firstName || !firstLastName || !country || !row['tipo_doc'] || !row['numero_documento']) {
+      if (!biostar_id || !firstName || !firstLastName || !country || !row['tipo_doc'] || !docNum) {
         errors.push({ sheet: 'Empleados', row: rowNumber, reason: 'id_biostar, primer_nombre, primer_apellido, pais, tipo_doc y numero_documento son obligatorios' });
         rejected++;
         continue;
@@ -143,18 +156,29 @@ export class ImportDataUseCase {
 
       try {
         await client.query(`SAVEPOINT row_${rowNumber}`);
+
+        const biostar_id_founded = await repo.getPersonByDocumentTypeAndNumber(normalizeText(row['tipo_doc']), docNum, country);
+
+        if (biostar_id_founded && biostar_id_founded !== biostar_id) {
+          errors.push({ sheet: 'Empleados', row: rowNumber, reason: 'Ya existe una persona con ese documento' });
+          rejected++;
+          await client.query(`ROLLBACK TO SAVEPOINT row_${rowNumber}`);
+          continue;
+        }
+
+
         const { personId, isNew } = await repo.upsertPerson({
           firstName,
           secondName: normalizeText(row['segundo_nombre']),
           firstLastName,
           secondLastName: normalizeText(row['segundo_apellido']),
-          biostar_id: biostar_id.toString().trim()
+          biostar_id: biostar_id
         });
 
-        if (row['tipo_doc'] && row['numero_documento'] && country) {
+        if (row['tipo_doc'] && docNum && country) {
           await repo.upsertDocument(personId, {
             documentType: normalizeText(row['tipo_doc']),
-            documentNumber: row['numero_documento'].toString().trim(),
+            documentNumber: docNum,
             country: country,
             main: true
           });
@@ -177,8 +201,8 @@ export class ImportDataUseCase {
     
     for (const [index, row] of rows.entries()) {
       const rowNumber = index + 2;
-      const biostar_id = row['biostar_id'];
-      const locationCode = row['codigo_ubicacion'];
+      const biostar_id = normalizeId(row['biostar_id']);
+      const locationCode = normalizeId(row['codigo_ubicacion']);
       const name = normalizeText(row['nombre']);
 
       if (!biostar_id || !locationCode || !name) {
@@ -189,13 +213,13 @@ export class ImportDataUseCase {
 
       try {
         await client.query(`SAVEPOINT row_${rowNumber}`);
-        const locationId = await locationRepo.getLocationIdByCode(locationCode.toString().trim());
+        const locationId = await locationRepo.getLocationIdByCode(locationCode);
         if (!locationId) {
           throw new Error(`No se encontro la ubicacion con codigo: ${locationCode}`);
         }
 
         const { isNew } = await accessPointRepo.upsertAccessPoint({
-          biostar_id: biostar_id.toString().trim(),
+          biostar_id: biostar_id,
           locationId: locationId,
           name: name
         });
