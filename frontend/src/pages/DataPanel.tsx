@@ -19,7 +19,47 @@ export default function DataPanel() {
     try {
       const endpoint = `/${activeTab}`;
       const response = await api.get(endpoint);
-      setData(response.data.data || []);
+      let fetchedData = response.data.data || [];
+
+      // Mapear y aplanar los datos según la pestaña activa para tener cabeceras amigables
+      switch (activeTab) {
+        case 'persons':
+          fetchedData = fetchedData.map((row: any) => ({
+            'ID BD': row.personId,
+            'biostar_id': row.biostar_id,
+            'primer_nombre': row.firstName,
+            'segundo_nombre': row.secondName || '',
+            'primer_apellido': row.firstLastName,
+            'segundo_apellido': row.secondLastName || '',
+            'tipo_doc': row.document?.documentType || '',
+            'numero_documento': row.document?.documentNumber || '',
+            'pais': row.document?.country || ''
+          }));
+          break;
+        case 'locations':
+          fetchedData = fetchedData.map((row: any) => ({
+            'ID Sede': row.locationId,
+            'codigo_ubicacion': row.locationCode,
+            'nombre_ubicacion': row.name,
+            'ciudad': row.city || '',
+            'pais': row.country || '',
+            'direccion': row.address || '',
+            'aforo_maximo': row.capacity || '0',
+            'activa': row.isActive ? 'SI' : 'NO',
+            'ubicacion_padre_id': row.parentLocationId || ''
+          }));
+          break;
+        case 'access-points':
+          fetchedData = fetchedData.map((row: any) => ({
+            'ID Puerta': row.accessPointId,
+            'nombre': row.name,
+            'biostar_id': row.biostar_id,
+            'codigo_ubicacion': row.locationCode
+          }));
+          break;
+      }
+
+      setData(fetchedData);
     } catch (error) {
       console.error('Error fetching data:', error);
       setData([]);
