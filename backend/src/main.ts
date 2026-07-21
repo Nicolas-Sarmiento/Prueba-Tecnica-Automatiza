@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
+import swaggerUi from 'swagger-ui-express';
+import * as swaggerDocument from './swagger.json';
 import { Database } from './infrastructure/database/Database';
 import { ImportController } from './infrastructure/http/ImportController';
 import { ImportDataUseCase } from './application/use-cases/ImportDataUseCase';
@@ -30,6 +32,9 @@ import { authenticateJWT, requireRole } from './infrastructure/http/middleware/A
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Init dependencies
 Database.initialize();

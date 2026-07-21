@@ -42,5 +42,15 @@ services:
       - "4000:4000"
     restart: always
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: automatiza_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
 volumes:
   pgdata:

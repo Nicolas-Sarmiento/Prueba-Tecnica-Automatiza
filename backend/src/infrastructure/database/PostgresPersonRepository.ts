@@ -93,4 +93,16 @@ export class PostgresPersonRepository implements IPersonRepository {
     if (res.rowCount === 0) return null;
     return res.rows[0].personId;
   }
+
+  async getPersonByDocumentTypeAndNumber(documentType: string, documentNumber: string, country: string): Promise<string | null> {
+    const query = `
+      SELECT p.biostar_id 
+      FROM "Document" d
+      JOIN "Person" p ON d."personId" = p."personId"
+      WHERE d."documentType" = $1 AND d."documentNumber" = $2 AND d."country" = $3
+    `;
+    const res = await this.db.query(query, [documentType, documentNumber, country]);
+    if (res.rowCount === 0) return null;
+    return res.rows[0].biostar_id;
+  }
 }

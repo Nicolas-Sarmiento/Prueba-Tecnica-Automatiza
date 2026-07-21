@@ -5,9 +5,8 @@ import { ImportDataUseCase } from '../../application/use-cases/ImportDataUseCase
 import { ExcelParserService } from '../services/ExcelParserService';
 
 async function seed() {
-  console.log('🌱 Iniciando poblado de base de datos (Seeding)...');
+  console.log('Iniciando poblado de base de datos...');
   
-  // Try to find data.xlsx in the container root, or local folder
   const possiblePaths = [
     path.resolve(process.cwd(), 'data.xlsx'),
     path.resolve(__dirname, '../../../../data.xlsx')
@@ -16,7 +15,7 @@ async function seed() {
   let targetPath = possiblePaths.find(p => fs.existsSync(p));
 
   if (!targetPath) {
-    console.error(`❌ No se encontro el archivo data.xlsx en las rutas: ${possiblePaths.join(', ')}`);
+    console.error(`No se encontro el archivo data.xlsx en las rutas: ${possiblePaths.join(', ')}`);
     process.exit(1);
   }
 
@@ -24,21 +23,18 @@ async function seed() {
     const fileBuffer = fs.readFileSync(targetPath);
     const excelParser = new ExcelParserService();
     const useCase = new ImportDataUseCase(excelParser);
-
-    // Importar todas las hojas
     const sheets = ['Ubicaciones', 'Empleados', 'Accesos'];
     const result = await useCase.execute(fileBuffer, sheets);
     
-    console.log('✅ Seeding exitoso. Resumen:');
+    console.log('Seeding exitoso. Resumen:');
     console.log(JSON.stringify(result.summary, null, 2));
 
     if (result.errors.length > 0) {
-      console.log(`⚠️ Hubo ${result.errors.length} errores de validacion de filas (omitidos).`);
+      console.log(`Hubo ${result.errors.length} errores de validacion de filas (omitidos).`);
     }
   } catch (error) {
-    console.error('❌ Error critico durante el seeding:', error);
+    console.error('Error critico durante el seeding:', error);
   } finally {
-    // Cerramos el cliente que se acaba de usar (el pool principal se quedara abierto si no hacemos exit)
     process.exit(0);
   }
 }

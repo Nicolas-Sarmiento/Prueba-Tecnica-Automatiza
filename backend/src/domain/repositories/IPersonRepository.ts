@@ -6,4 +6,5 @@ export interface IPersonRepository {
   upsertDocument(personId: number, document: Omit<Document, 'personId'>): Promise<void>;
   getAllPersons(): Promise<Person[]>;
   getPersonIdByBiostarId(biostar_id: string): Promise<number | null>;
+  getPersonByDocumentTypeAndNumber(documentType: string, documentNumber: string, country: string): Promise<string | null>;
 }
