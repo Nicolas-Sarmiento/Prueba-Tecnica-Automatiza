@@ -55,8 +55,10 @@ export class EventPollingService {
     this.isPolling = true;
 
     try {
+      console.log('[Polling] Consultando último timestamp en DB...');
       // Get the last event timestamp we have in DB
       const lastTimestamp = await this.eventRepository.getLatestEventTimestamp();
+      console.log(`[Polling] Último timestamp obtenido: ${lastTimestamp}`);
       
       let url = `${this.bioStarApiUrl}/api/events/search`;
       if (lastTimestamp) {
@@ -65,8 +67,10 @@ export class EventPollingService {
         url += `?start_datetime=${nextTime.toISOString()}`;
       }
 
-      const response = await axios.get(url);
+      console.log(`[Polling] Haciendo petición a BioStar Mock: ${url}`);
+      const response = await axios.get(url, { timeout: 5000 }); // 5 segundos de timeout
       const eventsData = response.data?.EventCollection?.rows || [];
+      console.log(`[Polling] Respuesta recibida, ${eventsData.length} eventos obtenidos.`);
 
       if (eventsData.length > 0) {
         console.log(`Fetched ${eventsData.length} new events from BioStar mock.`);
