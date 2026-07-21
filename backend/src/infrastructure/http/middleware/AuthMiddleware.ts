@@ -22,7 +22,7 @@ export const authenticateJWT = (req: AuthRequest, res: Response, next: NextFunct
 
     jwt.verify(token, secret, (err, user) => {
       if (err) {
-        res.sendStatus(403);
+        res.sendStatus(401);
         return;
       }
       req.user = user as any;
